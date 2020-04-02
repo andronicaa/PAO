@@ -91,7 +91,8 @@ public class Main {
         Scanner numere = new Scanner(System.in);
         Scanner siruri = new Scanner(System.in);
         int agenda = numere.nextInt();
-
+// !!! Toate input-urile trebuie date cu litere mici, in ordinea precizata si delimitate doar printr-un singur spatiu
+// !!! Datele calendartistice trebuie date sub forma de dd/MM/yyyy
 
         while (agenda != 5)
         {
