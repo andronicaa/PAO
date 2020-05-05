@@ -1,8 +1,12 @@
 package proiect.activitati;
 
-public class ActivitatiExtrascolare extends Activitate{
-    private String tipActivitate;
+import proiect.utilitati.Fisiere.WriteCSV;
 
+public class ActivitatiExtrascolare extends Activitate implements WriteCSV {
+    private String tipActivitate;
+    public ActivitatiExtrascolare() {
+        super();
+    }
     public ActivitatiExtrascolare(String numeActivitate, String data, String prioritate, String locatie, String tipActivitate) {
         super(numeActivitate, data, prioritate, locatie);
         this.tipActivitate = tipActivitate;
@@ -23,5 +27,10 @@ public class ActivitatiExtrascolare extends Activitate{
                 " Locatie= " + super.getLocatie() +
                 " tipActivitate='" + tipActivitate + '\'' +
                 '}';
+    }
+
+    @Override
+    public String[] toStringArray() {
+        return new String[]{super.getNumeActivitate(), super.getData(), super.getPrioritate(), super.getLocatie(), tipActivitate};
     }
 }

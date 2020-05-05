@@ -1,6 +1,7 @@
 package proiect.activitati;
 // clasa parinte pentru activitati de tipul: Intalniri, Examene, ActivitatiExtrascolare
 public class Activitate {
+
     private String numeActivitate;
     private String data;
     private String prioritate;
@@ -11,6 +12,10 @@ public class Activitate {
         this.data = data;
         this.prioritate = prioritate;
         this.locatie = locatie;
+    }
+
+    public Activitate() {
+
     }
 
     public String getNumeActivitate() {

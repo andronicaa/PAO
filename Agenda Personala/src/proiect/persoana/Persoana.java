@@ -1,6 +1,8 @@
 package proiect.persoana;
 
-public class Persoana {
+import proiect.utilitati.Fisiere.WriteCSV;
+
+public class Persoana implements WriteCSV {
     private String nume;
     private String prenume;
 
@@ -31,5 +33,10 @@ public class Persoana {
                 "nume='" + nume + '\'' +
                 ", prenume='" + prenume + '\'' +
                 '}';
+    }
+
+    @Override
+    public String[] toStringArray() {
+        return new String[]{nume, prenume};
     }
 }

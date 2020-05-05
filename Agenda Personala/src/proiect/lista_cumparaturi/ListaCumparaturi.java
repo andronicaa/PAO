@@ -1,11 +1,13 @@
 package proiect.lista_cumparaturi;
+import proiect.utilitati.Fisiere.WriteCSV;
+
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class ListaCumparaturi {
+public class ListaCumparaturi implements WriteCSV {
     private String produs;
     private String cantitate;
-
+    public ListaCumparaturi() {}
     public ListaCumparaturi(String produs, String cantitate) {
         this.produs = produs;
         this.cantitate = cantitate;
@@ -45,5 +47,12 @@ public class ListaCumparaturi {
                 ", cantitate='" + cantitate + '\'' +
                 '}';
     }
+
+    @Override
+    public String[] toStringArray() {
+        return new String[]{produs, cantitate};
+    }
+
+
 
 }

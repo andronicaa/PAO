@@ -1,12 +1,15 @@
 package proiect.plati;
 
+import proiect.utilitati.Fisiere.WriteCSV;
+
 import java.util.ArrayList;
 
-public class Plata {
+public class Plata implements WriteCSV {
     private String factura;
     private String dataFacturare;
     private String dataScadenta;
     private int pret;
+    public Plata(){}
     public Plata(String factura, String dataFacturare, String dataScadenta, int pret) {
         this.factura = factura;
         this.dataFacturare = dataFacturare;
@@ -41,4 +44,18 @@ public class Plata {
     }
     public int getPret() {return pret;}
 
+    @Override
+    public String toString() {
+        return "Plata{" +
+                "factura='" + factura + '\'' +
+                ", dataFacturare='" + dataFacturare + '\'' +
+                ", dataScadenta='" + dataScadenta + '\'' +
+                ", pret=" + pret +
+                '}';
+    }
+
+    @Override
+    public String[] toStringArray() {
+        return new String[]{factura, dataFacturare, dataScadenta, Integer.toString(pret)};
+    }
 }
