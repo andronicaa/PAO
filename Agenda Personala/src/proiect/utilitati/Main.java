@@ -30,7 +30,7 @@ public class Main {
         HobbyService hobbyService = new HobbyService();
         PlatiService platiService = new PlatiService();
 
-//        --------Liste ce retine diferite tipuri de obiecte----------------
+//        --------Liste ce retin diferite tipuri de obiecte----------------
         ArrayList<Activitate> activitati = new ArrayList<Activitate>();
         ArrayList<ListaCumparaturi> listaGeneralaCumparaturi = new ArrayList<ListaCumparaturi>();
         ArrayList<Intalniri> intalniri = new ArrayList<Intalniri>();
@@ -41,12 +41,69 @@ public class Main {
 //        folosesc un TreeMap pentru numerele de telefon pe care le sortez alfabetic dupa nume respectiv prenume
         TreeMap<Persoana, String> agendaTelefon = new TreeMap<Persoana, String>(new SortByName());
 
-
-//        ------------Date despre detinatorul agendei-----------------
+        //        ------------Date despre detinatorul agendei-----------------
         System.out.println("Detinator agenda:");
         TitularAgenda titular = TitularAgenda.TitularAgenda(); //clasa de tip singleton se poate instantia doar un obiect din cadrul acesteia
         titular.nume = "Andronic"; titular.prenume = "Alexandra"; titular.email = "alexandraandronic368@gmail.com"; titular.nrTelefon = "0740159113"; titular.salariu = 3000;
         System.out.println(titular.toString());
+// ------------------facem conexiunea la baza de date pentru toate serviciile
+        CumparaturiRepo cumparaturiRepo = new CumparaturiRepo();
+// --------------------------------------------------------------------------------------------------------------------------------------
+
+//        Trebuie sa "conectam" fiecare user la agenda sa - fiecare user se va conecta la contul sau printr-un username
+//        Daca username-ul nu exista, inseamna ca se va adauga unul nou in baza da date
+        System.out.println("Alegeti optiunea dorita");
+        System.out.println("1. LogIn");
+        System.out.println("2. Register");
+        System.out.print("Ce actiune doriti sa realizati: ");
+        Scanner readUserName = new Scanner(System.in);
+        Scanner readNumber = new Scanner(System.in);
+        UserRepository userAgenda = new UserRepository();
+        int userId = 0;
+        int option = readNumber.nextInt();
+        if (option == 1) {
+//             se va face autentificarea(gasim idPerson corespunzator)
+            System.out.print("Dati username-ul: ");
+            String userName = readUserName.nextLine();
+            userId = userAgenda.cautaUser(userName);
+            while (userId == 0) {
+                System.out.println("Ati gresit username-ul. Reincercati");
+                userName = readUserName.nextLine();
+                userId = userAgenda.cautaUser(userName);
+
+            }
+        }
+        else
+            if (option == 2)
+        {
+//            daca optiunea a fost 2, atunci i se va face un nou cont utilizatorului
+            System.out.print("Ce username doriti sa aveti? ");
+            String userName = readUserName.nextLine();
+            while (userAgenda.cautaUser(userName) != 0)
+            {   System.out.println("Acest username nu este valid, incercati altul");
+                userName = readUserName.nextLine();
+            }
+//                dupa ce s-a ales un username valid, se va adauga utilizatorul in baza de date
+//                trebuie sa adauge cateva date despre el
+            System.out.print("Numele de familie: ");
+            String lastName = readUserName.nextLine();
+            System.out.println();
+            System.out.print("Prenumele: ");
+            String firstName = readUserName.nextLine();
+            System.out.println();
+            System.out.print("Email-ul: ");
+            String email = readUserName.nextLine();
+            System.out.println();
+            System.out.print("Salariul dumneavoastra este: ");
+            int salary = readUserName.nextInt();
+            System.out.println();
+            userId = userAgenda.addUserToDB(lastName, firstName, email, salary, userName);
+            System.out.print("Utilizatorul nou adaugat este ");
+            System.out.print(userId);
+
+
+        }
+//        -----------------------------------------------------------------------------------------------------------------------
 
 //        ----------Facem un obiect de tipul AuditService, clasa contine o metoda LogActionInAuditFile ce scrie in audit.csv numele actiunii ce se face ------------
         AuditService scriereAudit = AuditService.AuditService();
@@ -96,6 +153,7 @@ public class Main {
 
         }
 
+
 //        ------------------Actiunile posibile ce se pot efectua-------------------
         System.out.println("Ce actiune doriti sa efectuati: ");
         System.out.println("1.Lista de cumparaturi");
@@ -122,35 +180,32 @@ public class Main {
                 int actiune = numere.nextInt();
                 if (actiune == 1) {
                     System.out.print("Ce produs vrei sa adaugi: ");
-                    String produsCantitate = siruri.nextLine();
+                    System.out.print("Produsul: ");
+                    String produs = siruri.nextLine();
+                    System.out.print("Cantitate: ");
+                    int cantitate = numere.nextInt();
                     System.out.println();
 //                    adaugam in fisierul audit
                     scriereAudit.LogActionInAuditFile("Adaugare produs in lista de cumparaturi", writer);
-                    int spatiu = produsCantitate.indexOf(" ");
-                    String produs = produsCantitate.substring(0, spatiu);
-                    String cantitate = produsCantitate.substring(spatiu + 1, produsCantitate.length());
-                    listaService.adaugaProdus(produs, cantitate, listaGeneralaCumparaturi);
-//                    listaService.display(listaGenerala);
+                    cumparaturiRepo.addProduct(userId, produs, cantitate);
+
                 }
 
                 if (actiune == 2)
                 {
                     System.out.println("Ce produs vrei sa stergi: ");
                     scriereAudit.LogActionInAuditFile("Stergere produs din lista de cumparaturi", writer);
-                    for (int i = 0; i < listaGeneralaCumparaturi.size(); i++)
-                    {
-                        System.out.println((i+1) + "." + listaGeneralaCumparaturi.get(i).getProdus() + " " + listaGeneralaCumparaturi.get(i).getCantitate());
-                    }
+                    cumparaturiRepo.displayLista(userId);
                     System.out.print("Ce produs vrei sa stergi: ");
-                    int nrProdus = numere.nextInt();
+                    String produs = siruri.nextLine();
                     System.out.println();
-                    listaService.stergeProdus(nrProdus, listaGeneralaCumparaturi);
+                    cumparaturiRepo.deleteProduct(userId, produs);
 
                 }
                 if (actiune == 3)
                 {
                     scriereAudit.LogActionInAuditFile("Lista de Cumparaturi", writer);
-                    listaService.display(listaGeneralaCumparaturi);
+                    cumparaturiRepo.displayLista(userId);
                 }
 
 

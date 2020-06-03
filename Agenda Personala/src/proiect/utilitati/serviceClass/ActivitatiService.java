@@ -20,7 +20,7 @@ public class ActivitatiService  {
 
 
 //    bounded wildcards
-    public static void listeazaActivitati(ArrayList<? extends Activitate> listaActivitati) {
+    public void listeazaActivitati(ArrayList<? extends Activitate> listaActivitati) {
         for(Activitate item : listaActivitati)
             System.out.println(item.toString());
     }
