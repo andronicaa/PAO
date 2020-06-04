@@ -1,10 +1,30 @@
 package proiect.utilitati.serviceClass;
 
+import proiect.utilitati.DataCurenta;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class UserRepository {
+    public void updateSalariuUser() {
+//        trebuie sa verific daca s-a depasit ziua de 15 a lunii curente, daca da, se va actualiza bugetul lunar
+        DataCurenta dataCurr = new DataCurenta();
+        int zi = Integer.parseInt(dataCurr.ziLuna());
+
+        if (zi >= 15) {
+            String updateSalariu = "UPDATE person SET buget_lunar = salariu + buget_lunar";
+            try {
+                PreparedStatement preparedStatement = DBService.getStatement(updateSalariu);
+
+                preparedStatement.executeUpdate();
+
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        }
+
+    }
 //  daca un user exista in baza de date, i se va returna ID-ul, daca nu, se va returna 0
     public int cautaUser(String userName) {
         String selectSql = "SELECT * FROM person WHERE username = ?";
@@ -14,7 +34,7 @@ public class UserRepository {
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()){
 //                exista deja utilizatorul in baza de date
-                System.out.println("Am intrat");
+//                System.out.println("Am intrat");
                 return resultSet.getInt("idPerson");}
 
 
@@ -45,7 +65,7 @@ public class UserRepository {
         }
 //       dupa ce am gasit id-ul maxim, trebuie sa adaugam noul user in sistem
         maxId += 1;
-        String insertUser = "INSERT INTO person VALUES (?, ?, ?, ?, ?, ?)";
+        String insertUser = "INSERT INTO person VALUES (?, ?, ?, ?, ?, ?, ?)";
         try {
             PreparedStatement preparedStatement = DBService.getStatement(insertUser);
             preparedStatement.setInt(1, maxId);
@@ -53,7 +73,8 @@ public class UserRepository {
             preparedStatement.setString(3, firstName);
             preparedStatement.setString(4, email);
             preparedStatement.setInt(5, salary);
-            preparedStatement.setString(6, userName);
+            preparedStatement.setInt(6, salary);
+            preparedStatement.setString(7, userName);
             preparedStatement.executeUpdate();
 
         } catch (SQLException ex) {
@@ -61,6 +82,25 @@ public class UserRepository {
         }
 //        returnam ID-ul user-ului adaugat
         return maxId;
+
+    }
+
+    public int getSalary(int userId) {
+
+        String selectSalary = "SELECT buget_lunar from person WHERE idPerson = ?";
+        try {
+            PreparedStatement preparedStatement = DBService.getStatement(selectSalary);
+            preparedStatement.setInt(1, userId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()){
+                return resultSet.getInt("buget_lunar");}
+
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return 0;
 
     }
 

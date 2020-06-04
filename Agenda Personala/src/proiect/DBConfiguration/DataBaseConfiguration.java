@@ -25,7 +25,7 @@ public class DataBaseConfiguration {
             ex.printStackTrace();
         }
         // s-a stabilit conexiunea
-        System.out.println("S-a stabilit conexiunea");
+//        System.out.println("S-a stabilit conexiunea");
          return databaseConnection;
     }
 
