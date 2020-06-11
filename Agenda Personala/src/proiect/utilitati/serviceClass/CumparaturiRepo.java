@@ -21,8 +21,9 @@ public class CumparaturiRepo {
             PreparedStatement preparedStatement = DBService.getStatement(selectSql);
             preparedStatement.setInt(1, UserId);
             ResultSet resultSet = preparedStatement.executeQuery();
+            System.out.println("Produsele sunt: ");
             while (resultSet.next())
-                System.out.println("Produsul este: " + resultSet.getString("produs") + " " + resultSet.getInt("cantitate"));
+                System.out.println(resultSet.getString("produs") + " " + resultSet.getInt("cantitate"));
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
@@ -38,7 +39,7 @@ public class CumparaturiRepo {
             preparedStatement.setInt(1, UserId);
             preparedStatement.setString(2, produs);
             preparedStatement.setInt(3, cantitate);
-//            inseram in baza de date nout produs
+//            inseram in baza de date noul produs
             preparedStatement.executeUpdate();
         } catch (SQLException ex) {
             ex.printStackTrace();

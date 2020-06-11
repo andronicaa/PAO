@@ -2,15 +2,9 @@ package proiect.utilitati;
 import proiect.activitati.Activitate;
 import proiect.activitati.ActivitatiExtrascolare;
 import proiect.activitati.Intalniri;
-import proiect.activitati.Examene;
 import proiect.lista_cumparaturi.ListaCumparaturi;
-import proiect.persoana.Persoana;
-import proiect.plati.Plata;
 import proiect.utilitati.Fisiere.ReadFromCSVFile;
-import proiect.utilitati.Fisiere.WriteInCSVFile;
 import proiect.utilitati.serviceClass.*;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -24,13 +18,10 @@ public class Main {
 
 //        Activitati
         ActivitatiService activitatiService = new ActivitatiService();
-        IntalniriService intalniriService = new IntalniriService();
         HobbyService hobbyService = new HobbyService();
 
 //        --------Liste ce retin diferite tipuri de obiecte----------------
         ArrayList<Activitate> activitati = new ArrayList<Activitate>();
-        ArrayList<ListaCumparaturi> listaGeneralaCumparaturi = new ArrayList<ListaCumparaturi>();
-        ArrayList<Intalniri> intalniri = new ArrayList<Intalniri>();
         ArrayList<ActivitatiExtrascolare> hobby = new ArrayList<ActivitatiExtrascolare>();
 
 
@@ -55,7 +46,10 @@ public class Main {
         Scanner readUserName = new Scanner(System.in);
         Scanner readNumber = new Scanner(System.in);
         int userId = 0;
+        int nrIncercari = 0;
         int option = readNumber.nextInt();
+        String anOption = "";
+        String mail = "";
         if (option == 1) {
 //             se va face autentificarea(gasim idPerson corespunzator)
             System.out.print("Dati username-ul: ");
@@ -65,17 +59,42 @@ public class Main {
                 System.out.println("Ati gresit username-ul. Reincercati");
                 userName = readUserName.nextLine();
                 userId = userAgenda.cautaUser(userName);
+                nrIncercari ++;
+                if (nrIncercari >= 3) {
+//                    daca utilizatorul a incercat sa se conecteze si a esuat de mai mult de 3 ori ii oferim posibilitatea sa isi recupereze userNameul cu ajutorul emailului(este unic)
+                    System.out.print("Pentru a va recupera usernameul este necesar sa introduceti mail-ul: ");
+                    mail = readUserName.nextLine();
+//                    cautam mail-ul corespunzator in baza de date si afisam numele, prenumele si username-ul
+                    ArrayList<String> listaUser = new ArrayList<String>();
+                    listaUser = userAgenda.getUserName(mail);
+
+                    if (listaUser.isEmpty())
+                        {System.out.print("Nu exista acest mail in baza de date. Doriti sa va inregistrati in baza de date? Da/ Nu: ");
+                        anOption = readUserName.nextLine();
+                        if (anOption.equals("Da"))
+                            option = 2;
+                        userId = -1;}
+                    else
+                    {   userId = userAgenda.cautaUser(listaUser.get(2));
+                        System.out.print("Datele dumneavoastra sunt: ");
+                        for (int i = 0; i < listaUser.size(); i++)
+                            System.out.print(listaUser.get(i) + " ");
+                        System.out.println();
+                    }
+
+
+                }
 
             }
         }
-        else
+
             if (option == 2)
         {
 //            daca optiunea a fost 2, atunci i se va face un nou cont utilizatorului
             System.out.print("Ce username doriti sa aveti? ");
             String userName = readUserName.nextLine();
             while (userAgenda.cautaUser(userName) != 0)
-            {   System.out.println("Acest username nu este valid, incercati altul");
+            {   System.out.println("Acest username nu este valid, incercati altul.");
                 userName = readUserName.nextLine();
             }
 //                dupa ce s-a ales un username valid, se va adauga utilizatorul in baza de date
@@ -94,28 +113,20 @@ public class Main {
             System.out.println();
             userId = userAgenda.addUserToDB(lastName, firstName, email, salary, userName);
             System.out.print("Utilizatorul nou adaugat este: ");
-            System.out.print(userId);
+            System.out.println(userId);
 
 
         }
 
 //        -----------------------------------------------------------------------------------------------------------------------
 
-
+//          Bugetul userilor se vor actualiza dupa data de 15 a lunii
+        userAgenda.updateBugetUser();
 
 
 //        Trebuie sa extragem toate datele din fisere pentru a putea realiza operatii pe ele, dupa care, la iesirea din program, vor fi incarcate din nou in fisier
 //        Incarcam datele pentru lista de cumparaturi
         ReadFromCSVFile citeste = ReadFromCSVFile.ReadFromCSVFile();
-
-//        Incarcam datele pentru Intalniri
-        String intalniriFile = "src/proiect/utilitati/Fisiere/intalniri.csv";
-        for (String intalnire : citeste.ReadCSV(intalniriFile)) {
-            intalniri.add(intalniriService.process(intalnire));
-            activitati.add(intalniriService.process(intalnire));
-        }
-
-
 
 //        Incarcam datele pentru Hobbyuri
         String hobbyFile = "src/proiect/utilitati/Fisiere/hobby.csv";
@@ -123,8 +134,6 @@ public class Main {
             hobby.add(hobbyService.process(objHobby));
             activitati.add(hobbyService.process(objHobby));
         }
-
-
 
 
 //        ------------------Actiunile posibile ce se pot efectua-------------------
@@ -148,7 +157,7 @@ public class Main {
 
 
                 System.out.println("1.Adauga produs: ");
-                System.out.println("2.Sterge produs(numarul produsului): ");
+                System.out.println("2.Sterge produs: ");
                 System.out.println("3.Listeaza produsele: ");
                 System.out.print("Alegere: ");
                 int actiune = numere.nextInt();
@@ -458,7 +467,6 @@ public class Main {
                             System.out.print("Data scadenta: ");
                             dataScadenta = siruri.nextLine();
                             format.parse(dataFacturare);
-                            System.out.println("formatul este " + format.parse(dataFacturare));
                             format.parse(dataScadenta);
                             validInput = true;
 
@@ -516,7 +524,6 @@ public class Main {
 
 //            Cand iesim din aplicatie trebuie sa actualizam fisierele si sa le inchidem
         hobbyService.updateFileHobby("src/proiect/utilitati/Fisiere/hobby.csv", hobby);
-        intalniriService.updateFileIntalniri("src/proiect/utilitati/Fisiere/intalniri.csv", intalniri);
 
 
     }

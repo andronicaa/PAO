@@ -5,9 +5,10 @@ import proiect.utilitati.DataCurenta;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class UserRepository {
-    public void updateSalariuUser() {
+    public void updateBugetUser() {
 //        trebuie sa verific daca s-a depasit ziua de 15 a lunii curente, daca da, se va actualiza bugetul lunar
         DataCurenta dataCurr = new DataCurenta();
         int zi = Integer.parseInt(dataCurr.ziLuna());
@@ -34,7 +35,6 @@ public class UserRepository {
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()){
 //                exista deja utilizatorul in baza de date
-//                System.out.println("Am intrat");
                 return resultSet.getInt("idPerson");}
 
 
@@ -101,6 +101,29 @@ public class UserRepository {
         }
 
         return 0;
+
+    }
+
+    public ArrayList<String> getUserName(String email) {
+        String selectUserName = "SELECT first_name, last_name, username FROM person WHERE email = ?";
+        ArrayList<String> userInfo = new ArrayList<String>();
+        try {
+            PreparedStatement preparedStatement = DBService.getStatement(selectUserName);
+            preparedStatement.setString(1, email);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()){
+//                System.out.print("Datele dumneavoastra sunt: " + resultSet.getString("last_name") + resultSet.getString("first_name") + " cu username-ul " + resultSet.getString("username"));
+                userInfo.add(resultSet.getString("last_name"));
+                userInfo.add(resultSet.getString("first_name"));
+                userInfo.add(resultSet.getString("username"));
+            }
+
+
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return userInfo;
 
     }
 

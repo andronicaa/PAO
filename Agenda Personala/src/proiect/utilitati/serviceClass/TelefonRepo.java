@@ -5,7 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class TelefonRepo {
-//    Metoda ce afiseaza toate numerele din lista de contacte ale unui utilizator
+//    Metoda ce afiseaza toate numerele din lista de contacte ale unui utilizator in ordine alfabetica a numelui de familie
     public void displayAgenda(int userId) {
         String displayContacts = "SELECT * FROM telefon WHERE userId = ? ORDER BY last_name";
         try {

@@ -1,13 +1,12 @@
 package proiect.utilitati.serviceClass;
-
 import proiect.utilitati.DataCurenta;
-
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class ExamenRepo {
+//    creare tabel pentru examene
     public void creatExamTable() {
         String createTable = "CREATE TABLE IF NOT EXISTS examen" +
                 "(idExam int PRIMARY KEY AUTO_INCREMENT," +
@@ -24,6 +23,8 @@ public class ExamenRepo {
             ex.printStackTrace();
         }
     }
+
+//    inserare nou examen in tabel
     public void insertExamen(int userId, String materie, String locatie, String data) {
         int maxId = 0;
         Date dataExamen = Date.valueOf(data);
@@ -56,7 +57,7 @@ public class ExamenRepo {
             ex.printStackTrace();
         }
     }
-
+//  afisare examen luna prezizata
     public void exameneLunaPrec(int userId, int luna) {
 
         boolean examen = false;
