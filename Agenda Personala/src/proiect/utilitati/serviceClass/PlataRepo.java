@@ -1,7 +1,5 @@
 package proiect.utilitati.serviceClass;
-
 import proiect.utilitati.DataCurenta;
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -21,7 +19,7 @@ public class PlataRepo {
 
             while (resultSet.next()){
 //                listam facturile
-                System.out.println("Factura la " + resultSet.getString("tip_factura") + " cu data de facturare pe " + resultSet.getString("data_facturare") +
+                System.out.println("Factura cu id-ul " + resultSet.getInt("idFactura") + " la " + resultSet.getString("tip_factura") + " cu data de facturare pe " + resultSet.getString("data_facturare") +
                         " si cea scadenta " + resultSet.getString("data_scadenta") + " costa " + resultSet.getInt("pret") + " lei");
             }
 
@@ -49,14 +47,14 @@ public class PlataRepo {
 //                trebuie sa stergem factura din baza de date si sa actualizam bugetul user-ului
 //                mai intai verificam daca exista suficient buget pentru a plati factura
 //                cautam bugetul in tabelul person
-                String cautaBuget = "SELECT salariu FROM person WHERE idPerson = ?";
+                String cautaBuget = "SELECT buget_lunar FROM person WHERE idPerson = ?";
                 try {
                     preparedStatement = DBService.getStatement(cautaBuget);
                     preparedStatement.setInt(1, userId);
                     resultSet = preparedStatement.executeQuery();
                     if (resultSet.next())
                     {
-                        int buget = resultSet.getInt("salariu");
+                        int buget = resultSet.getInt("buget_lunar");
                         if (buget - pretFactura < 0)
                             System.out.println("Nu aveti suficient buget pentru a plati aceasta factura");
                         else
@@ -73,9 +71,9 @@ public class PlataRepo {
                                 ex.printStackTrace();
                             }
 //                            trebuie sa actualizam salariul utilizatorului
-                            String updateSalariu = "UPDATE person SET salariu = ? WHERE idPerson = ?";
+                            String updateBuget = "UPDATE person SET buget_lunar = ? WHERE idPerson = ?";
                             try {
-                                preparedStatement = DBService.getStatement(updateSalariu);
+                                preparedStatement = DBService.getStatement(updateBuget);
                                 preparedStatement.setInt(1, buget - pretFactura);
                                 preparedStatement.setInt(2, userId);
                                 preparedStatement.executeUpdate();
@@ -128,10 +126,12 @@ public class PlataRepo {
 
     //    listam facturile scadente
     public void facturiScadenta(int userId) throws ParseException {
+
 //        determinam data curenta
         boolean facturiScadente = false;
         DataCurenta dataCurr = new DataCurenta();
         String data = dataCurr.dataCurenta();
+
 //        cautam facturile corespunzatoare unui anumit user
         String dataFacturare = "SELECT tip_factura, CONVERT(data_scadenta, CHAR) AS `dataScadenta`, pret FROM plata WHERE userId = ?";
         try {
@@ -181,6 +181,7 @@ public class PlataRepo {
             }
 //       dupa ce am gasit id-ul maxim, trebuie sa adaugam noul user in sistem
             maxId += 1;
+            System.out.println("Max id este" + maxId);
             String insertFactura = "INSERT INTO plata VALUES (?, ?, ?, ?, ?, ?)";
             try {
                 PreparedStatement preparedStatement = DBService.getStatement(insertFactura);

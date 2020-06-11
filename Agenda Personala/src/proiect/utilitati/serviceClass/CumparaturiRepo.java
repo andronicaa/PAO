@@ -22,7 +22,7 @@ public class CumparaturiRepo {
             preparedStatement.setInt(1, UserId);
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next())
-                System.out.println(resultSet.getString("produs") + " " + resultSet.getInt("cantitate"));
+                System.out.println("Produsul este: " + resultSet.getString("produs") + " " + resultSet.getInt("cantitate"));
         } catch (SQLException ex) {
             ex.printStackTrace();
         }

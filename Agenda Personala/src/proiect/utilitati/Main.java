@@ -42,6 +42,8 @@ public class Main {
         TelefonRepo agTelefon = new TelefonRepo();
         ExamenRepo examRepo = new ExamenRepo();
         examRepo.creatExamTable();
+        IntalniriRepo intalniriRepo = new IntalniriRepo();
+        intalniriRepo.createTable();
 // --------------------------------------------------------------------------------------------------------------------------------------
 
 //        Trebuie sa "conectam" fiecare user la agenda sa - fiecare user se va conecta la contul sau printr-un username
@@ -91,13 +93,12 @@ public class Main {
             int salary = readUserName.nextInt();
             System.out.println();
             userId = userAgenda.addUserToDB(lastName, firstName, email, salary, userName);
-            System.out.print("Utilizatorul nou adaugat este ");
+            System.out.print("Utilizatorul nou adaugat este: ");
             System.out.print(userId);
 
 
         }
-//            TESTEZ DACA SE EXTRAGE BINE ZIUA DIN LUNA
-        userAgenda.updateSalariuUser();
+
 //        -----------------------------------------------------------------------------------------------------------------------
 
 
@@ -193,13 +194,13 @@ public class Main {
                 {
                     System.out.println("Ce produs vrei sa stergi: ");
                     cumparaturiRepo.displayLista(userId);
-                    System.out.print("Ce produs vrei sa stergi: ");
                     String produs = "";
                     validInput = false;
                     while (!validInput) {
                         try {
+                            System.out.print("Produs: ");
                             produs = siruri.nextLine();
-                            if (Pattern.compile( "[0-9]" ).matcher(produs).find())
+                            if (Pattern.compile( "[0-9]").matcher(produs).find())
                                 throw new IllegalArgumentException("Produsul trebuie sa fie un cuvant, nu trebuie sa contina numere!");
                             validInput = true;
 
@@ -224,8 +225,8 @@ public class Main {
 
                 System.out.println("Numere de telefon: ");
                 agTelefon.displayAgenda(userId);
-                System.out.println("1.Adauga numar de telefon(nume prenume numar de telefon): ");
-                System.out.println("2.Sterge numar de telefon(nume prenume): ");
+                System.out.println("1.Adauga numar de telefon: ");
+                System.out.println("2.Sterge numar de telefon: ");
                 System.out.println("3.Afiseaza agenda ");
                 System.out.print("Alegere: ");
                 int actiune = numere.nextInt();
@@ -258,6 +259,7 @@ public class Main {
                     validInput = false;
                     while (!validInput) {
                         try {
+                            System.out.print("Numarul contactului pe care doriti sa-l eliminati din agenda: ");
                             idContact = numere.nextInt();
                             if (idContact < 1)
                                 throw new IllegalArgumentException("Numarul trebuie sa fie mai mare decat 0.");
@@ -295,14 +297,16 @@ public class Main {
 
                     {
 
-                        System.out.print("Data(dd/MM/yyyy) Prioritate Locatie Nume Prenume: ");
+                        System.out.print("Data(yyyy-MM-dd) Prioritate Locatie Nume Prenume: ");
                         audit.addAuditService(userId, "Adaugare intalnire");
-                        String s = siruri.nextLine();
-                        System.out.println();
-                        String[] cuvinte = s.split(" ");
-                        Intalniri intalnire = new Intalniri("Intalnire", cuvinte[0], cuvinte[1], cuvinte[2], cuvinte[3], cuvinte[4]);
-                        activitati.add(intalnire);
-                        intalniri.add(intalnire);
+                        System.out.print("Data: "); String dataIntalnire = siruri.nextLine();
+                        System.out.print("Locatie: "); String locatie = siruri.nextLine();
+                        System.out.print("Nume: "); String nume = siruri.nextLine();
+                        System.out.print("Prenume: "); String prenume = siruri.nextLine();
+                        System.out.print("Ora: "); int ora = numere.nextInt();
+                        intalniriRepo.adaugaIntalnire(userId, dataIntalnire, locatie, nume, prenume, ora);
+
+
                     }
 
                     if (tipActivitate.equals("2"))
@@ -315,13 +319,13 @@ public class Main {
                         String dataExamen = "";
                         while (!validInput){
                             try {
-                                System.out.print("Data(yyyy-mm-dd): "); dataExamen = siruri.nextLine();
+                                System.out.print("Data(yyyy-MM-dd): "); dataExamen = siruri.nextLine();
                                 format.parse(dataExamen);
                                 validInput = true;
 
 
-                            } catch (ParseException ex)  {
-                                System.out.println("Data nu este valida. Trebuie sa fie de forma yyyy-mm-dd");
+                            } catch (ParseException | IllegalArgumentException ex)  {
+                                System.out.println("Data nu este valida. Trebuie sa fie de forma yyyy-MM-dd");
                             }
                         }
 
@@ -348,24 +352,19 @@ public class Main {
                 {// Listeaza Activitatile
                     audit.addAuditService(userId, "Listeaza activitatile");
                     System.out.println("Lista activitati: ");
-                    activitatiService.listeazaActivitati(activitati);
+//                    activitatiService.listeazaActivitati(activitati);
+                    intalniriRepo.afiseazaIntalniriCurente(userId, "n");
 
                 }
                 if (actiune == 3){
-                    System.out.println("1.Arata Intalnirile in functie de data si prioritate");
+                    System.out.println("1. Listeaza intalnirile din data curenta");
                     System.out.println("2.Arata ce examene am intr-o luna precizata:");
                     System.out.print("Alege: ");
                     int nr = numere.nextInt();
                     System.out.println();
                     if (nr == 1){
-                        audit.addAuditService(userId, "Sortarea intalnirilor in functie de prioritate");
-                        System.out.println("Sortam intalnirile: ");
-                        intalniriService.sortIntalniri(intalniri);
-
-                        for (Intalniri value : intalniri) {
-                            System.out.println("Data: " + value.getData() + " locatie: " + value.getLocatie() + " cu " + value.getNume() + " " + value.getPrenume());
-
-                        }
+                        audit.addAuditService(userId, "Listarea intalnirilor din data curenta");
+                        intalniriRepo.afiseazaIntalniriCurente(userId, "y");
                     }
                     if (nr == 2) {
                         audit.addAuditService(userId, "Afisare examen");
@@ -375,7 +374,7 @@ public class Main {
                         while (!validInput) {
                             try {
                                 System.out.print("Luna: "); luna = numere.nextInt();
-                                if (luna < 1 || luna > 12)
+                                if (luna < 1 || luna > 12 || luna % 1 != 0)
                                     throw new IllegalArgumentException("Numarul trebuie sa fie corespunzator unei luni(intre 1 si 12)");
                                 validInput = true;
                             } catch (IllegalArgumentException ex) {
@@ -413,14 +412,15 @@ public class Main {
                 if (actiune == 2)
                 {
 
-//                    Listez toate facturile care sunt de platit pe luna in curs pentru un UserID
+//                    Listez toate facturile
                     System.out.println("Facturile pe care trebuie sa le platiti sunt: ");
                     platiUser.listeazaFacturi(userId);
                     System.out.print("Ce factura doriti sa platiti: ");
                     int idFactura = 0;
+                    validInput = false;
                     while (!validInput) {
                         try {
-                            System.out.print("Luna: "); idFactura = numere.nextInt();
+                            System.out.print("Numarul facturii de platit: "); idFactura = numere.nextInt();
                             if (idFactura < 0)
                                 throw new IllegalArgumentException("Numarul trebuie sa fie natural");
                             validInput = true;
@@ -437,15 +437,15 @@ public class Main {
                 }
                 if (actiune == 3)
                 {
-                    System.out.println("Facturile ce au trecut de data scadenta");
-//                    aici trebuie sa vad in ce data curenta si sa o compar cu data scadenta a fiecarei facturi
+                    System.out.println("Facturile ce au trecut de data scadenta:");
+//                    verific daca data scadenta a trecut de data curenta
                     platiUser.facturiScadenta(userId);
                     audit.addAuditService(userId, "Afisare Facturi Scadente");
                 }
                 if (actiune == 4)
                 {
                     DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-                    System.out.print("Ce factura doriti sa adaugati(tipFactura dataFacturare dataScadenta pret): ");
+                    System.out.print("Ce factura doriti sa adaugati: ");
                     System.out.print("Tip factura: ");
                     String tipFactura = siruri.nextLine();
                     String dataFacturare = "";
@@ -458,12 +458,13 @@ public class Main {
                             System.out.print("Data scadenta: ");
                             dataScadenta = siruri.nextLine();
                             format.parse(dataFacturare);
+                            System.out.println("formatul este " + format.parse(dataFacturare));
                             format.parse(dataScadenta);
                             validInput = true;
 
 
                         } catch (ParseException ex)  {
-                            System.out.println("Data nu este valida. Trebuie sa fie de forma yyyy-mm-dd");
+                            System.out.println("Data nu este valida. Trebuie sa fie de forma yyyy-MM-dd");
                         }
                     }
 
@@ -480,6 +481,7 @@ public class Main {
                             System.out.println(ex.getMessage());
                         }
                     }
+//                    adaug factura in baza de date
                     platiUser.adaugaFactura(userId, tipFactura, dataFacturare, dataScadenta, pret);
                     audit.addAuditService(userId, "Adaugare factura");
 
