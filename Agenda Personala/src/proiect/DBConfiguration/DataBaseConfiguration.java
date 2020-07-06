@@ -6,7 +6,7 @@ public class DataBaseConfiguration {
 //    ------------------Clasa ce stabileste conexiunea la baza de date --------------------------
     private static final String DB_URL = "jdbc:mysql://localhost:3306/datatest?" + "autoReconnect=true&useSSL=false";
     private static final String USER = "root";
-    private static final String PASSWORD = "Genesis1234&99";
+    private static final String PASSWORD = "";
 
     private static Connection databaseConnection;
 
